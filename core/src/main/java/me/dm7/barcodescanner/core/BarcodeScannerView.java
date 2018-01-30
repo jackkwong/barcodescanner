@@ -24,6 +24,7 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
     private Boolean mFlashState;
     private boolean mAutofocusState = true;
     private boolean mShouldScaleToFill = true;
+    private boolean showViewFinder = true;
 
     private boolean mIsLaserEnabled = true;
     @ColorInt private int mLaserColor = getResources().getColor(R.color.viewfinder_laser);
@@ -108,6 +109,10 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
      * @return {@link android.view.View} that implements {@link ViewFinderView}
      */
     protected IViewFinder createViewFinderView(Context context) {
+        if (!showViewFinder) {
+            return new TransparentViewFinderView(context);
+        }
+
         ViewFinderView viewFinderView = new ViewFinderView(context);
         viewFinderView.setBorderColor(mBorderColor);
         viewFinderView.setLaserColor(mLaserColor);
@@ -185,7 +190,9 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
         mCameraWrapper = cameraWrapper;
         if(mCameraWrapper != null) {
             setupLayout(mCameraWrapper);
-            mViewFinderView.setupViewFinder();
+            if (showViewFinder) {
+                mViewFinderView.setupViewFinder();
+            }
             if(mFlashState != null) {
                 setFlash(mFlashState);
             }
@@ -297,6 +304,10 @@ public abstract class BarcodeScannerView extends FrameLayout implements Camera.P
         if(mPreview != null) {
             mPreview.setAutoFocus(state);
         }
+    }
+
+    public void hideViewFinder() {
+        this.showViewFinder = false;
     }
 
     public void setShouldScaleToFill(boolean shouldScaleToFill) {
